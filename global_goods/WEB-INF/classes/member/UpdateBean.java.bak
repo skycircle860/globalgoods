@@ -1,0 +1,53 @@
+package member;
+
+import java.io.*;
+import common.db.*;
+import common.main.*;
+
+public class UpdateBean extends MainBean
+{
+	public void funcExecute() throws Exception
+	{
+		String id = (String)inputTable.get("id");
+		String pass = (String)inputTable.get("pass");
+		String passQ = (String)inputTable.get("passQ");
+		String passA = (String)inputTable.get("passA");
+		String home1 = (String)inputTable.get("home1");
+		String home2 = (String)inputTable.get("home2");
+		String home3 = (String)inputTable.get("home3");
+		String office1 = (String)inputTable.get("office1");
+		String office2 = (String)inputTable.get("office2");
+		String office3 = (String)inputTable.get("office3");
+		String mobile1 = (String)inputTable.get("mobile1");
+		String mobile2 = (String)inputTable.get("mobile2");
+		String mobile3 = (String)inputTable.get("mobile3");
+		String zipCode1 = (String)inputTable.get("zipCode1");
+		String zipCode2 = (String)inputTable.get("zipCode2");
+		String addr1 = (String)inputTable.get("addr1");
+		String addr2 = (String)inputTable.get("addr2");
+		String email = (String)inputTable.get("email");
+		String client = (String)inputTable.get("client");
+
+		String [] interestArray = (String [])inputTable.get("interest");
+		String interest = "";
+		for(int i=0; i<interestArray.length; i++)
+		{
+			if(i>0)
+			{
+				interest = interest + "^";
+			}
+			interest = interest + interestArray[i];
+		}
+
+		queryBuffer = new StringBuffer("");
+		queryBuffer.append("UPDATE MEMBER SET PASS='"+pass+"',PASS_Q='"+passQ+"',PASS_A='"+passA+"', HOME1='"+home1+"', HOME2='"+home2+"', HOME3='"+home3+"', ");
+		queryBuffer.append("OFFICE1='"+office1+"', OFFICE2='"+office2+"', OFFICE3='"+office3+"', ");
+		queryBuffer.append("MOBILE1='"+mobile1+"', MOBILE2='"+mobile2+"', MOBILE3='"+mobile3+"', ");
+		queryBuffer.append("ZIPCODE1='"+zipCode1+"', ZIPCODE2='"+zipCode2+"', ADDR1='"+addr1+"', ADDR2='"+addr2+"', EMAIL='"+email+"', ");
+		queryBuffer.append("INTEREST='"+interest+"', UPD_ID='"+id+"', UPD_DATE=SYSDATE, UPD_IP='"+client+"' ");
+		queryBuffer.append("WHERE ID='"+id+"'");
+
+		DBExecute dbe = new DBExecute(queryBuffer.toString());
+		outputList = dbe.getDataList();
+	}
+}

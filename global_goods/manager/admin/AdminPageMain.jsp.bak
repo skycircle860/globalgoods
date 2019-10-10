@@ -1,0 +1,163 @@
+<%@ page contentType="text/html;charset=euc-kr" %>
+<%@ page language="java" %>
+<%@ page import="java.util.*" %>
+
+<jsp:useBean id="outputTable" scope="request" class="java.util.Hashtable" type="java.util.Hashtable" />
+
+<%
+	ArrayList orderList = (ArrayList)outputTable.get("orderList");
+
+%>
+
+<SCRIPT language="JavaScript">
+/*
+	// 정보확인
+	function checkAction()
+	{
+		document.location.href="/commonServlet.mo";
+	}
+
+
+	// 취미 수정 페이지 가기
+	function goUpdate(code)
+	{
+		document.location.href='/managerHobbyServlet.mo?func=managerHobby_004&from=list&code='+code;
+	}
+
+	// 취미 사용 or 삭제 하기
+	function goUseYn(code, yn)
+	{
+		var alertStr = "선택하신 취미를 사용하지 못하게 하시겠습니까?";
+		if(yn=='Y')
+		{
+			alertStr = "선택하신 취미를 사용 하시겠습니까?";
+		}
+		if(confirm(alertStr))
+		{
+			document.location.href="/managerHobbyServlet.mo?func=managerHobby_003&yn="+yn+"&code="+code;
+		}
+	}
+
+	// 취미 추가
+	function goAdd()
+	{
+		window.open("/common/Progress.jsp", "addHobby", "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, width=400, height=200");
+		window.name = "listWin";
+		document.addForm.submit();
+	}
+
+	// 선택방법 변경
+	function selectApply()
+	{
+		document.selectForm.submit();
+	}
+	*/
+
+	
+	// 상세정보 페이지 가기
+	function goDetailInfo(seq)
+	{
+		document.location.href="/managerOrderServlet.mo?func=managerOrder_002&seq="+seq;
+	}
+</SCRIPT>
+
+<CENTER>
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="25"></TD></TR>
+	</TABLE>
+	<TABLE cellspacing="1" cellpadding="5" bgcolor="#7682EB" width="700">
+		<TR>
+			<TD align="center" bgcolor="#E4F2FC" width="300">
+				<FONT color="blue" size="3"><B>주문 정보</B></FONT>
+			</TD>
+			<TD align="center" bgcolor="#E4F2FC" width="300">
+				<FONT color="blue" size="3"><B>주문 취소</B></FONT>
+			</TD>
+			<TD align="center" bgcolor="#E4F2FC" width="300">
+				<FONT color="blue" size="3"><B>배송 신청</B></FONT>
+			</TD>
+			<TD align="center" bgcolor="#E4F2FC" width="300">
+				<FONT color="blue" size="3"><B>배송 완료</B></FONT>
+			</TD>
+		</TR>
+		
+	</TABLE>
+
+
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="25"></TD></TR>
+	</TABLE>
+
+	<TABLE cellspacing="0" cellpadding="0" width="750">
+		<TR>
+			<TD align="right">
+				<IMG src="/images/button/button_add.gif" border="0" onclick="goAdd();" style="cursor:hand" align="absmiddle">
+			</TD>
+		</TR>
+		<TR><TD height="3"></TD></TR>
+	</TABLE>
+	<TABLE cellspacing="1" cellpadding="4" bgcolor="#7682EB" width="750">
+		<TR bgcolor="#CFDDFA" align="center">
+			<TD width="100"><B>주문일자</B></TD>
+			<TD><B>상품명</B></TD>
+			<TD width="100"><B>주문상태</B></TD>
+			<TD width="100"><B>배송여부</B></TD>
+			<TD width="100"><B>입금상태</B></TD>
+		</TR>
+<%
+	for(int i=0; i<orderList.size(); i++)
+	{
+		Hashtable orderTable = (Hashtable)orderList.get(i);
+		
+		String orderDate = (String)orderTable.get("REG_DATE");
+		String state = (String)orderTable.get("ORDER_STATE");
+		String depositYn = (String)orderTable.get("DEPOSITYN");
+		String seq = (String)orderTable.get("GOODS_SEQS");
+		
+		System.out.println("test === "+depositYn);
+
+		String bgcolor = "#FFFFFF";
+
+		String useDeposit = "입금완료";
+
+		if(depositYn.equals("N"))
+		{
+			useDeposit = "입금대기";
+		}
+%>
+		<TR bgcolor="<%= bgcolor%>" align="center">
+			<TD><A href="javascript:goDetailInfo('<%= seq%>')"><%= orderDate%></A></TD>
+			
+			<TD><%= seq%></TD>
+			<TD><%= state%></TD>
+			<TD><B>배송중</B></TD>
+			<TD><B><%= useDeposit%></B></TD>
+			
+		</TR>
+<%
+	}
+	
+	if(orderList.size()==0)
+	{
+%>
+		<TR><TD align="center" bgcolor="#FFFFFF" colspan="6"><B>주문 정보가 없습니다.</B></TD></TR>
+<%
+	}
+%>
+	</TABLE>
+	<TABLE cellspacing="0" cellpadding="0" width="750">
+		<TR><TD height="5"></TD></TR>
+		<TR>
+			<TD align="center">
+				<IMG src="/images/button/but_ok.gif" border="0" onclick="checkAction();" style="cursor:hand" align="absmiddle">
+			</TD>
+		</TR>
+		<TR><TD height="3"></TD></TR>
+	</TABLE>
+	<TABLE cellspacing="0" cellpadding="0" width="700">
+		<TR><TD height="20"></TD></TR>
+	</TABLE>
+</CENTER>
+<FORM name="addForm" method="post" action="/managerHobbyServlet.mo" target="addHobby">
+	<INPUT type="hidden" name="func" value="managerHobby_006">
+</FORM>

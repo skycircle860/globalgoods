@@ -1,0 +1,26 @@
+<%@ page contentType="text/html;charset=euc-kr" %>
+<%@ page language="java"%>
+<%@ page import="java.util.*" %>
+
+<jsp:useBean id="outputTable" scope="request" class="java.util.Hashtable" type="java.util.Hashtable" />
+<jsp:useBean id="inputTable" scope="request" class="java.util.Hashtable" type="java.util.Hashtable" />
+<%
+	ArrayList noticeList = (ArrayList)outputTable.get("noticeList");
+
+
+
+	for(int i =0 ;i < noticeList.size() ;i++ )
+	{
+		Hashtable noticeTable = (Hashtable)noticeList.get(i);
+		
+		String title = (String)bbsTable.get("TITLE");
+		String reg_date = (String)bbsTable.get("REG_DATE");
+%>
+		<div>제목 : <%=title%> 등록일 : <%=reg_date%></div>
+<%
+	}
+%>
+
+		<DIV>
+			<h2> 공지사항 jsp </h2>
+		</DIV>

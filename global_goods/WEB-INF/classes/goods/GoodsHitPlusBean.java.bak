@@ -1,0 +1,20 @@
+package goods;
+
+import java.io.*;
+import common.db.*;
+import common.main.*;
+import java.util.*;
+
+public class GoodsHitPlusBean extends MainBean
+{
+	public void funcExecute() throws Exception
+	{
+		String code = (String)inputTable.get("code");
+		
+		queryBuffer = new StringBuffer("");
+		queryBuffer.append(" UPDATE GOODS SET GOODS_HIT = GOODS_HIT+1 WHERE CODE = '"+code+"' ");
+
+		DBExecute dbe = new DBExecute(queryBuffer.toString());
+
+	}
+}

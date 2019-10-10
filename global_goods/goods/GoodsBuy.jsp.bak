@@ -1,0 +1,57 @@
+
+<SCRIPT src="/js/jquery-1.9.1.min.js"></SCRIPT>
+<SCRIPT src="/js/text-utils.js"></SCRIPT>
+<SCRIPT>
+	$(document).ready(function(){
+		$('#price').text(insertComma("<%=parPrice%>"));
+		$('#totalPrice').text(insertComma("<%=parPrice%>"));
+		});
+	function resumePrice()
+	{
+		var f = document.goodsPageForm;
+		var amount = f.amount.value;
+		var price = $('#price').text();
+
+		price = deleteComma(price);
+
+		var totalCash = price * amount;
+		$('#totalPrice').text(insertComma(totalCash));
+		$('#price').text(insertComma(price));
+	}
+</SCRIPT>
+<FORM name="goodsPageForm" method="POST" action="goodsServlet.mo">
+	<TABLE cellspacing="0" cellpadding="0" width="400" height="600">
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;border-top: 1px solid #c0c0c0;">상품명</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;border-top: 1px solid #c0c0c0;"><%=name%></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;">제조사</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><%=company%></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;">원산지</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><%=country%></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;">내용량</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><%=quantity%></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;">상품정보</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><%=goodsComment%></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;">구매수량</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><input type="text" maxlength="4" name="amount" id="amount" value="1" size="1" onkeyup="resumePrice();"></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;" >가격</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><SPAN id="price"></SPAN><SPAN>원</SPAN></TD>
+		</TR>
+		<TR>
+			<TD width="150px" bgcolor="#eeeeee" height= "40px" style="border-bottom: 1px solid #c0c0c0;">결재금액</TD>
+			<TD width="450px"  style="border-bottom: 1px solid #c0c0c0;"><FONT color="red" size="3"><B><SPAN id="totalPrice"></SPAN></B></FONT><SPAN>원</SPAN></TD>
+		</TR>
+	</TABLE>
+ </FORM>

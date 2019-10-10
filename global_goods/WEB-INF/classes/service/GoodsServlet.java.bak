@@ -1,0 +1,410 @@
+package service;
+
+import common.main.*;
+import common.util.*;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import goods.*;
+
+public class GoodsServlet extends MainServlet
+{
+	public void performTask(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, Exception
+	{
+		String alignSelect = "";
+		if (request.getParameter("alignSelect") != null && ((String)request.getParameter("alignSelect")).length() != 0)
+		{
+			alignSelect = (String)request.getParameter("alignSelect");
+		}
+
+		String middleCategory = "";
+		if (request.getParameter("middleCategory")!= null && ((String)request.getParameter("middleCategory")).length() != 0)
+		{
+			middleCategory = (String)request.getParameter("middleCategory");
+		}
+
+		String section = "";
+		if (request.getParameter("section")!= null && ((String)request.getParameter("section")).length() != 0)
+		{
+			section = (String)request.getParameter("section");
+		}
+
+		String goodsWord = "";
+		if (request.getParameter("goodsWord")!= null && ((String)request.getParameter("goodsWord")).length() != 0)
+		{
+			goodsWord = entoKo((String)request.getParameter("goodsWord"));
+		}
+
+		String subcode="";
+		if (request.getParameter("subcode")!= null && ((String)request.getParameter("subcode")).length() != 0)
+		{
+			subcode = (String)request.getParameter("subcode");
+		}
+		String from = "";
+		if (request.getParameter("from") != null && ((String)request.getParameter("from")).length() != 0)
+		{
+			from = (String)request.getParameter("from");
+		}
+		String goodsHit = "";
+		if (request.getParameter("goodsHit") != null && ((String)request.getParameter("goodsHit")).length() != 0)
+		{
+			goodsHit = (String)request.getParameter("goodsHit");
+		}
+		
+		//레프트메뉴가 반응하는 세션
+		session.setAttribute("category", "middle_category");
+
+		inputTable.put("middleCategory",middleCategory);	
+		inputTable.put("alignSelect",alignSelect);
+		inputTable.put("section",section);
+		inputTable.put("goodsWord",goodsWord);
+
+		inputTable.put("subcode",subcode);
+		
+		inputTable.put("from",from);
+		inputTable.put("goodsHit",goodsHit);
+
+System.out.println(func);
+		//상품 리스트페이지 가기
+		if(func.equals("goods_001"))
+		{
+			
+			//준교형 리스트
+			GoodsListBean glb = new GoodsListBean();
+			glb.setDataTable(inputTable);
+			glb.funcExecute();
+			ArrayList goodsList = glb.getDataList();
+			outputTable.put("goodsList",goodsList);
+	
+
+			//혜리스트
+			SuperMiddleCategoryListBean smcb = new SuperMiddleCategoryListBean();
+			smcb.setDataTable(inputTable);
+			smcb.funcExecute();
+			ArrayList superMiddlecategoryList = smcb.getDataList();
+			outputTable.put("superMiddlecategoryList", superMiddlecategoryList);
+			
+			moveType = "FW";
+			mode = "S";
+			mainUrl = "/goods/GoodsList.jsp";
+		}
+		//상품 상세페이지 가기
+		else if (func.equals("goods_002"))
+		{
+			String code = (String)request.getParameter("code");
+			
+			if (goodsHit.length()!= 0 && goodsHit.equals("Y"))
+			{
+				GoodsHitPlusBean ghpb = new GoodsHitPlusBean();
+				ghpb.funcExecute();
+			}
+			inputTable.put("code",code);
+
+			GoodsViewBean gvb = new GoodsViewBean();
+			gvb.setDataTable(inputTable);
+			gvb.funcExecute();
+
+			ArrayList goodsList = gvb.getDataList();
+			outputTable.put("goodsList",goodsList);
+
+			moveType = "FW";
+			mode = "S";
+			mainUrl = "/goods/GoodsView.jsp";
+		}
+		//상품 구매페이지 가기
+		else if (func.equals("goods_003"))
+		{
+			/*
+			String code = (String)request.getParameter("code");
+			String name = (String)request.getParameter("name");
+			String company = (String)request.getParameter("company");
+			String country = (String)request.getParameter("country");
+			String quantity = (String)request.getParameter("quantity");
+			String amount = (String)request.getParameter("amount");
+			String goodsComment = (String)request.getParameter("goodsComment");
+			String parPrice = (String)request.getParameter("parPrice");
+
+			inputTable.put("code",code);
+			inputTable.put("name",name);
+			inputTable.put("company",company);
+			inputTable.put("country",country);
+			inputTable.put("quantity",quantity);
+			inputTable.put("amount",amount);
+			inputTable.put("goodsComment",goodsComment);
+			inputTable.put("parPrice",parPrice);
+
+			moveType = "FW";
+			mode = "S";
+			*/
+			System.out.println(func);
+			String code = (String)request.getParameter("code");
+
+			inputTable.put("code",code);
+
+			GoodsViewBean gvb = new GoodsViewBean();
+			gvb.setDataTable(inputTable);
+			gvb.funcExecute();
+
+			ArrayList goodsList = gvb.getDataList();
+			outputTable.put("goodsList",goodsList);
+
+			moveType = "FW";
+			mode = "P";
+			mainUrl = "/goods/GoodsBuy.jsp";
+		}
+		//장바구니에 담기
+		else if (func.equals("goods_004"))
+		{
+			String id = (String)session.getAttribute("id");
+			String code = (String)request.getParameter("code");
+			String amount = (String)request.getParameter("amount");
+			String client = request.getRemoteAddr();
+
+			inputTable.put("id",id);
+			inputTable.put("code",code);
+			inputTable.put("amount",amount);
+			inputTable.put("client",client);
+			
+			System.out.println(inputTable);
+			//상품이 추가되어있는지 확인
+			GoodsCartSearchBean gcsb = new GoodsCartSearchBean();
+
+			System.out.println("GoodsCartSearchBean");
+			gcsb.setDataTable(inputTable);
+			gcsb.funcExecute();
+			ArrayList goodsList = gcsb.getDataList();
+
+			if (goodsList.size() > 0)
+			{
+				message = "이미 상품이 등록되어 있습니다.";
+
+				moveType = "FW";
+				mode = "T";
+				stepUrl = "/goodsServlet.mo?func=goods_002&code="+code;
+			}
+			else
+			{
+				GoodsCartAddBean gclb = new GoodsCartAddBean();
+				System.out.println("GoodsCartAddBean");
+				gclb.setDataTable(inputTable);
+				gclb.funcExecute();
+
+				ArrayList goodsCartList = gclb.getDataList();
+				int resultCount = Integer.parseInt((String)((Hashtable)goodsCartList.get(0)).get("COUNT"));
+				if(resultCount>0)
+				{
+					message = "장바구니에 추가되었습니다.";
+				}
+				else
+				{
+					message = "추가 되지 않았습니다. 다시 시도하거나, 관리자에게 문의하세요!";
+				}
+
+				moveType = "FW";
+				mode = "T";
+				stepUrl = "/goodsServlet.mo?func=goods_002&code="+code;
+			}
+		}
+		//장바구니 페이지가기
+		else if (func.equals("goods_005"))
+		{
+			String id = (String)session.getAttribute("id");
+
+			inputTable.put("id",id);
+
+			GoodsCartListBean gclb = new GoodsCartListBean();
+			gclb.setDataTable(inputTable);
+			gclb.funcExecute();
+
+			ArrayList shoppingCartList = gclb.getDataList();
+
+			outputTable.put("shoppingCartList",shoppingCartList);
+			/*
+			for (int i = 0;i<shoppingCartList.size() ;i++ )
+			{
+				System.out.println("하아아아아아아\n"+shoppingCartList.get(i));
+			}*/
+			moveType = "FW";
+			mode = "S";
+			mainUrl = "/goods/ShoppingCart.jsp";
+		}
+		//장바구니 아이템 삭제
+		else if (func.equals("goods_006"))
+		{
+			String id = (String)session.getAttribute("id");
+			String code = (String)request.getParameter("code");
+		
+			inputTable.put("id", id);
+			inputTable.put("code", code);
+
+			GoodsCartDeleteBean gcdb = new GoodsCartDeleteBean();
+			gcdb.setDataTable(inputTable);
+			gcdb.funcExecute();
+			ArrayList deleteList = gcdb.getDataList();
+
+			if(deleteList.size() == 0)
+			{
+				message = "장바구니에서 물품이 제거되지 않았습니다.";
+			}
+			else
+			{
+				message = "장바구니에서 물품이 성공적으로 제거되었습니다";
+			}
+
+
+			moveType = "FW";
+			mode = "T";
+			stepUrl = "/goodsServlet.mo?func=goods_005";
+		}
+		//sub_category 리스트 보이기
+		else if (func.equals("goods_007"))
+		{	
+			String subname = "";
+			if (request.getParameter("subname")!=null && ((String)request.getParameter("subname")).length() != 0)
+			{
+				subname = entoKo((String)request.getParameter("subname"));
+			}
+
+			System.out.println("goodsServlet subcode : "+subcode+" subname : "+subname);
+			inputTable.put("subname", subname);
+			//혜리스트- top메뉴 클릭시 레프트메뉴에 sub_category 리스트 뿌리기
+			SuperMiddleCategoryListBean smcb = new SuperMiddleCategoryListBean();
+			smcb.setDataTable(inputTable);
+			smcb.funcExecute();
+			ArrayList superMiddlecategoryList = smcb.getDataList();
+			outputTable.put("superMiddlecategoryList", superMiddlecategoryList);
+			
+			//혜리스트- 레프트메뉴(sub_category) 클릭시 메인 화면에 해당하는 상품 뿌리기
+			SubCategoryGoodsListBean scglb = new SubCategoryGoodsListBean();
+			scglb.setDataTable(inputTable);
+			scglb.funcExecute();
+			ArrayList subcategorygoodsList = scglb.getDataList();
+			outputTable.put("subcategorygoodsList",subcategorygoodsList);
+						
+			moveType = "FW";
+			mode = "S";
+			mainUrl = "/goods/SubCategoryGoodsList.jsp";
+
+		}
+		//관심상품 추가
+		else if (func.equals("goods_CDH001"))
+		{
+			String id = (String)session.getAttribute("id");
+			String code = (String)request.getParameter("code");
+			String client = request.getRemoteAddr();
+
+			inputTable.put("id",id);
+			inputTable.put("code",code);
+			inputTable.put("client",client);
+			
+			System.out.println(inputTable);
+			//관심상품이 추가되어있는지 확인
+			GoodsInterestSearchBean gisb = new GoodsInterestSearchBean();
+
+			System.out.println("GoodsInterestSearchBean");
+			gisb.setDataTable(inputTable);
+			gisb.funcExecute();
+			ArrayList goodsList = gisb.getDataList();
+
+			if (goodsList.size() > 0)
+			{
+				message = "이미 관심상품으로 등록되어 있습니다.";
+
+				moveType = "FW";
+				mode = "T";
+				stepUrl = "/goodsServlet.mo?func=goods_001";
+			}
+			else
+			{
+				GoodsInterestAddBean giab = new GoodsInterestAddBean();
+				System.out.println("GoodsInterestAddBean");
+				giab.setDataTable(inputTable);
+				giab.funcExecute();
+
+				ArrayList goodsInterestList = giab.getDataList();
+				int resultCount = Integer.parseInt((String)((Hashtable)goodsInterestList.get(0)).get("COUNT"));
+				if(resultCount>0)
+				{
+					message = "관심상품에 추가되었습니다.";
+				}
+				else
+				{
+					message = "추가 되지 않았습니다. 다시 시도하거나, 관리자에게 문의하세요!";
+				}
+
+				moveType = "FW";
+				mode = "T";
+				stepUrl = "/goodsServlet.mo?func=goods_001";
+			}
+		}
+		//관심상품 페이지가기
+		else if (func.equals("goods_CDH002"))
+		{
+			String id = (String)session.getAttribute("id");
+
+			inputTable.put("id",id);
+			System.out.println("관심상품 리스트 전");
+			GoodsInterestListBean gilb = new GoodsInterestListBean();
+			gilb.setDataTable(inputTable);
+			gilb.funcExecute();
+			System.out.println("관심상품 리스트 후");
+			ArrayList shoppingInterestList = gilb.getDataList();
+			System.out.println("관심상품 리스트 outputTable에 담기 전");
+			outputTable.put("shoppingInterestList", shoppingInterestList);
+			/*
+			for (int i = 0;i<shoppingInterestList.size() ;i++ )
+			{
+				System.out.println("하아아아아아아\n"+shoppingInterestList.get(i));
+			}*/
+			System.out.println("관심상품 리스트 outputTable에 담은 후");
+			moveType = "FW";
+			mode = "S";
+			mainUrl = "/goods/ShoppingInterest.jsp";
+		}
+		//관심상품 삭제
+		else if (func.equals("goods_CDH003"))
+		{
+			String id = (String)session.getAttribute("id");
+			String code = (String)request.getParameter("code");
+		
+			inputTable.put("id", id);
+			inputTable.put("code", code);
+
+			GoodsInterestDeleteBean gidb = new GoodsInterestDeleteBean();
+			gidb.setDataTable(inputTable);
+			gidb.funcExecute();
+			ArrayList deleteList = gidb.getDataList();
+
+			if(deleteList.size() == 0)
+			{
+				message = "관심상품에서 물품이 제거되지 않았습니다.";
+			}
+			else
+			{
+				message = "관심상품에서 물품이 성공적으로 제거되었습니다";
+			}
+
+
+			moveType = "FW";
+			mode = "T";
+			stepUrl = "/goodsServlet.mo?func=goods_CDH002";
+		}
+		//이미지 디테일뷰
+		else if (func.equals("goods_kww001"))
+		{
+			String imgSrc = (String)request.getParameter("imgSrc");
+			String imgName = (String)request.getParameter("imgName");
+			String name = entoKo((String)request.getParameter("name"));
+			System.out.println(imgSrc+imgName);
+			inputTable.put("imgSrc",imgSrc);
+			inputTable.put("imgName",imgName);
+			inputTable.put("name", name);
+
+			moveType = "FW";
+			mode = "P";
+			mainUrl = "/goods/GoodsDetailImg.jsp";
+		}
+	}
+}

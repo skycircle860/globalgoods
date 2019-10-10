@@ -1,0 +1,44 @@
+<%@ page contentType="text/html; charset=EUC_KR" %> 
+<%@ page import="java.io.*" %> 
+<% 
+	//응답 헤더의 Content-Type을 세팅한다. 
+	response.setContentType("application/x-msdownload"); 
+
+	String savePath = entoKo(request.getParameter("savePath"));
+	String saveName = entoKo(request.getParameter("saveName"));
+	String orgName = request.getParameter("orgName");
+
+	response.setHeader("Content-Disposition","attachment; filename="+orgName); 
+
+	File file = new File (savePath+"/"+saveName); 
+
+	byte[] bytestream = new byte[(int)file.length()]; 
+
+	FileInputStream filestream = new FileInputStream(file); 
+	int i = 0, j = 0; 
+
+	while((i = filestream.read()) != -1)
+	{ 
+		bytestream[j] = (byte)i; 
+		j++; 
+	}
+
+	OutputStream outStream = response.getOutputStream(); 
+	outStream.write(bytestream); 
+	outStream.close();
+	filestream.close();
+	outStream = null;
+	filestream = null;
+%>
+
+<%!
+	public String entoKo(String en){
+		String korCharSet = null;
+		try{
+			korCharSet = new String(en.getBytes("8859_1"),"KSC5601");
+		}catch(UnsupportedEncodingException uee){
+			System.out.println(uee);
+		}
+		return korCharSet;
+	}
+%>

@@ -1,0 +1,65 @@
+package goods;
+
+import java.io.*;
+import common.db.*;
+import common.main.*;
+import java.util.*;
+
+public class GoodsCartDeleteBean extends MainBean
+{
+	public void funcExecute() throws Exception
+	{
+		String code = (String)inputTable.get("code");
+		String id = (String)inputTable.get("id");
+		
+		queryBuffer = new StringBuffer("");
+		
+		queryBuffer.append("DELETE FROM CART_GOODS_LIST WHERE GOODS_CODE = '"+code+"' AND MEMBER_ID = '"+id+"'");
+		DBExecute dbe = new DBExecute(queryBuffer.toString());
+		
+		//파일 꺼내기
+		ArrayList tempList = dbe.getDataList();
+
+		/*
+		System.out.println("**************여기는 ListBean***********");
+		System.out.println("*****************************************");
+		System.out.println("tempList : "+tempList);
+		System.out.println("****************************************");
+		*/
+
+		String dataNum = "";
+		ArrayList fileList = new ArrayList();
+		Hashtable goodsTable;
+		for(int i=0; i<tempList.size(); i++)
+		{
+			Hashtable tempTable = (Hashtable)tempList.get(i);
+			String tempDataNum = (String)tempTable.get("DATA_NUM");
+			String tempOrgName = (String)tempTable.get("ORG_NAME");
+			String tempSaveName = (String)tempTable.get("SAVE_NAME");
+			String tempPath = (String)tempTable.get("PATH");
+			
+			System.out.println("tempSaveName : "+tempSaveName);
+			if(!dataNum.equals(tempDataNum))
+			{
+				tempTable.remove("ORG_NAME");
+				tempTable.remove("SAVE_NAME");
+				tempTable.remove("PATH");
+
+				goodsTable = tempTable;
+
+				fileList = new ArrayList();
+				dataNum = tempDataNum;
+
+				goodsTable.put("FILE_LIST", fileList);
+				outputList.add(goodsTable);
+			}
+
+			Hashtable fileTable = new Hashtable();
+			fileTable.put("ORG_NAME", tempOrgName);
+			fileTable.put("SAVE_NAME", tempSaveName);
+			fileTable.put("PATH", tempPath);
+
+			fileList.add(fileTable);
+		}
+	}
+}

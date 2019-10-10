@@ -1,0 +1,163 @@
+<%@ page contentType="text/html;charset=euc-kr" %>
+<%@ page language="java" %>
+<%@ page import="java.util.*" %>
+
+<jsp:useBean id="outputTable" scope="request" class="java.util.Hashtable" type="java.util.Hashtable" />
+<jsp:useBean id="inputTable" scope="request" class="java.util.Hashtable" type="java.util.Hashtable" />
+
+
+<%
+	ArrayList supportViewList = (ArrayList)outputTable.get("supportViewList");
+
+	Hashtable supportViewTable = (Hashtable)supportViewList.get(0);
+
+	String seq = (String)supportViewTable.get("SEQ");
+	String title = (String)supportViewTable.get("TITLE");
+	String hitCnt = (String)supportViewTable.get("HIT_CNT");
+	String regDate = (String)supportViewTable.get("REG_DATE");
+	String updDate = (String)supportViewTable.get("UPD_DATE");
+	String regId = (String)supportViewTable.get("REG_ID");
+	String regName = (String)supportViewTable.get("NAME");
+	String content = (String)supportViewTable.get("CONTENT");
+	
+	String code = (String)inputTable.get("code");
+	String id = (String)inputTable.get("id");
+
+	boolean loginYn = false;
+	boolean writerYn = false;
+	boolean adminYn = false;
+	if(session != null && session.getAttribute("loginYn")!=null && ((String)session.getAttribute("loginYn")).equals("Y"))
+	{
+		loginYn = true;
+	}
+	if(loginYn && regId.equals((String)session.getAttribute("id")))
+	{
+		writerYn = true;
+	}
+	if(loginYn && ((String)session.getAttribute("adminYn")).equals("Y"))
+	{
+		adminYn = true;
+	}
+
+
+	%>
+
+	<SCRIPT language="JavaScript">
+	function updateAction()
+	{
+		var f = document.updateForm;
+		if(trim(f.title.value)=="")
+		{
+			window.alert("제목을 입력하세요");
+			f.title.focus();
+			return false;
+		}
+		if(trim(f.content.value)=="")
+		{
+			window.alert("본문을 입력하세요");
+			f.content.focus();
+			return false;
+		}
+		alert("수정 버튼을 눌렀습니다.");
+		f.submit();
+	}
+	function cancelAction()
+	{
+		document.location.href="/supportServlet.mo?func=support_005&code=<%=code%>&seq="+<%= seq%>;
+	}
+</script>
+
+
+<FORM name="bbsForm" action="/supportServlet.mo" method="post">
+	<INPUT type="hidden" name="func">
+	<INPUT type="hidden" name="seq" value="<%= seq%>">
+	<INPUT type="hidden" name="hit" value="N">
+	<INPUT type="hidden" name="code" value="<%= code%>">
+	<INPUT type="hidden" name="pageNum" value="<%= pageNum%>">
+	<INPUT type="hidden" name="section" value="<%= section%>">
+	<INPUT type="hidden" name="word" value="<%= word%>">
+</FORM>	
+</FORM>
+
+<CENTER>
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="15"></TD></TR>
+	</TABLE>
+
+	<TABLE cellspacing="1" cellpadding="5" bgcolor="#7682EB" width="250">
+		<TR>
+			<TD align="center" bgcolor="#CFDDFA" width="250">
+				<FONT color="blue" size="3"><B>공지사항 수정하기</B></FONT>
+			</TD>
+		</TR>
+	</TABLE>
+
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="10"></TD></TR>
+	</TABLE>
+
+	<TABLE cellspacing="0" cellpadding="0" width="700">
+		<TR>
+			<TD width="700">
+				<IMG src="/images/button/button_all_list.gif" border="0" onclick="listAction();" style="cursor:hand" align="absmiddle">
+			</TD>
+		</TR>
+	</TABLE>
+
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="2"></TD></TR>
+	</TABLE>
+
+	<TABLE cellspacing="1" cellpadding="5" width="700" bgcolor="#7682EB">
+		<FORM name="updateForm" action="/supportServlet.mo" method="post">
+			<INPUT type="hidden" name="func" value="support_007">
+			<INPUT type="hidden" name="seq" value="<%= seq%>">
+			<INPUT type="hidden" name = "code" value="<%= code%>">
+			<INPUT type="hidden" name = "id" value="<%= id%>">
+
+
+			<TR>
+				<TD width="100" align="center" bgcolor="#CFDDFA"><B>작성자</B></TD>
+				<TD width="250" bgcolor="#FFFFFF"><B><%= regName%></B>(<%= regId%>)</TD>
+				<TD width="100" align="center" bgcolor="#CFDDFA"><B>조회수</B></TD>
+				<TD width="250" bgcolor="#FFFFFF">조회수 값을 넣을것!!</TD>
+			</TR>
+			<TR>
+				<TD align="center" bgcolor="#CFDDFA"><B>제 목</B></TD>
+				<TD bgcolor="#FFFFFF" colspan="3"><INPUT type="text" name="title" value="<%= title%>" size="84" maxlength="200"></TD>
+			</TR>
+			<TR>
+				<TD align="center" bgcolor="#CFDDFA" height="200"><B>내 용</B></TD>
+				<TD bgcolor="#FFFFFF" colspan="3" valign="top"><TEXTAREA name="content" cols="83" rows="15"><%= content%></TEXTAREA></TD>
+			</TR>
+			<TR>
+				<TD align="center" bgcolor="#CFDDFA"><B>등록일</B></TD>
+				<TD bgcolor="#FFFFFF"><%= regDate%></TD>
+				<TD align="center" bgcolor="#CFDDFA"><B>최종수정일</B></TD>
+				<TD bgcolor="#FFFFFF"><%= updDate%></TD>
+			</TR>
+		</FORM>
+	</TABLE>
+
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="5"></TD></TR>
+	</TABLE>
+
+	<TABLE cellspacing="0" cellpadding="0" width="700">
+		<TR>
+			<TD width="700" align="center">
+<%
+	if(writerYn || adminYn)
+	{
+%>
+				<IMG src="/images/button/but_ok.gif" border="0" onclick="updateAction();" style="cursor:hand" align="absmiddle">
+<%
+	}
+%>
+				<IMG src="/images/button/but_cancel1.gif" border="0" onclick="cancelAction();" style="cursor:hand" align="absmiddle">
+			</TD>
+		</TR>
+	</TABLE>
+	<TABLE cellspacing="0" cellpadding="0">
+		<TR><TD height="10"></TD></TR>
+	</TABLE>
